@@ -167,6 +167,51 @@ class TwitchBot(commands.Bot):
             doubled_odds_usernames.append(username)
             await ctx.send(f'{ctx.author.name}, your chances have been doubled!')
 
+    @commands.command(name='getWheel')
+    async def getWheel_command(self, ctx):
+        """Command: getWheel:
+        
+            executable only by users in allowed_users
+            Uses the current stored list usernames to update OR create a private wheel
+            A new wheel is created if:
+                * the wheel named defined in config.json doesn't exist in the user's private wheels
+            An existing wheel is updated if:
+                ** the wheel named defined in config.json does exist in the user's private wheels
+
+            The wheel created can be accessed through the website.
+        
+        """
+
+        if not self.is_user_allowed(ctx.author):
+            if self.verbose:
+                await ctx.send(f'{ctx.author.name}, you are not allowed to create a wheel.')
+            return
+
+        wheel = {
+            'config': {
+                'title': config['wheel_name'],
+                'description': 'A wheel of elite Ghostdivers.',
+                'entries': [{'text': user} for user in usernames]
+            }
+        }
+
+        url = 'https://wheelofnames.com/api/v1/wheels/private'
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, application/xml',
+            'x-api-key': API_KEY
+        }
+
+        try:
+            response = requests.put(url, headers=headers, data=json.dumps(wheel))
+            response.raise_for_status()
+            jsonResponse = response.json()
+            path = jsonResponse['data']['path']
+            print("wheel created! go check it out in your account!")
+        
+        except Exception as e:
+            print('Failed to create the wheel. Please try again later.')
+
 if __name__ == '__main__':
     bot = TwitchBot()
     bot.run()
