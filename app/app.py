@@ -1,0 +1,172 @@
+import requests
+import json
+from twitchio.ext import commands
+
+
+with open('config.json') as config_file:
+    config = json.load(config_file)
+
+API_KEY = config['WoN_api_key']
+
+usernames = []
+doubled_odds_usernames = []
+MAX_USERS = config['max_users']
+
+"""helper function to return the count of unique usernames"""
+def unique_usernames():
+    return len(set(usernames))
+
+class TwitchBot(commands.Bot):
+    """
+        Class for the twitch bot, inherits from twitch API bot
+        Reads the necessary config from the config.json file
+    """
+    def __init__(self):
+        """Fields:
+
+            listening: if the bot is collecting usernames for the wheel or not
+            doubling_allowed: essentially allows the usage of the command !here, which Doubles the odds of the people already on the wheel.
+            verbose: enables or disables extra result reporting for used commands
+            allowed_users: privilaged users who are able to execute privilaged commands such as start, stop, etc. These are defined in the file config.json
+
+        """
+        super().__init__(token=config['oauth_token'], prefix='!', initial_channels=[config['channel']])
+        self.listening = False
+        self.doubling_allowed = False
+        self.verbose = config['verbose']
+        self.allowed_users = [user.lower() for user in config['allowed_users']]
+
+    def is_user_allowed(self, user):
+        """Helper function to check if the user is allowed to run certain commands."""
+        return user.name.lower() in self.allowed_users
+
+
+    async def event_ready(self):
+        """initial print to confirm starting of the bot"""
+        print(f'Logged in as | {self.nick}')
+        print(f'Connected to {self.connected_channels}')
+
+    @commands.command(name='start') 
+    async def start_command(self, ctx):
+        """Command: !start
+
+            executable only by users in allowed_users
+            allows the bot to listen for users who wish to join the wheel
+        
+        """
+        if not self.is_user_allowed(ctx.author):
+            if self.verbose:
+                await ctx.send(f'{ctx.author.name}, you are not allowed to start the bot.')
+            return
+
+        if self.listening:
+            if self.verbose:
+                await ctx.send('Already listening')
+            return
+        else:
+            self.listening = True
+            await ctx.send('Now listening for usernames!')
+
+    @commands.command(name='stop')
+    async def stop_command(self, ctx):
+        """Command: !stop
+
+            executable only by users in allowed_users
+            disallows the bot to listen for users who wish to join the wheel
+        
+        """
+        if not self.is_user_allowed(ctx.author):
+            if self.verbose:
+                await ctx.send(f'{ctx.author.name}, you are not allowed to start the bot.')
+            return
+
+        if self.listening:
+            self.listening = False
+            await ctx.send('Stopped listening for usernames.')
+        elif not self.listening:
+            if self.verbose:
+                await ctx.send('The bot is not currently listening for usernames.')
+
+    @commands.command(name='odds')
+    async def odds_command(self, ctx):
+        """Command: !odds
+
+            executable only by users in allowed_users
+            allows the users to use the !here command
+        
+        """
+        if not self.is_user_allowed(ctx.author):
+            if self.verbose:
+                await ctx.send(f'{ctx.author.name}, you are not allowed to start doubling odds.')
+            return
+        else:
+            self.doubling_allowed = True
+            await ctx.send('doubling your odds is now allowed!')
+
+    @commands.command(name='wheel')
+    async def wheel_command(self, ctx):
+        """Command: !wheel
+
+            executable by users only after the command !start
+            Attempts to add the user to the wheel, if not already present
+        
+        """
+        if not self.listening:
+            if self.verbose:
+                await ctx.send(f'{ctx.author.name}, the bot is not currently listening for usernames.')
+            return
+        
+        if unique_usernames() >= MAX_USERS:
+            if self.verbose:
+                await ctx.send('Reached the maximum number of users. Stopping collection.')
+            return
+
+        
+        username = ctx.author.name
+        if username not in usernames:
+            usernames.append(username)
+            await ctx.send(f'{username} has been added to the wheel!')
+        else:
+            if self.verbose:
+                ctx.send(f'{username}, you are already on the wheel!')
+
+    @commands.command(name='here')
+    async def here_command(self, ctx):
+        """Command: !here
+
+            executable only after the commands !odds and while the bot is not listening, so before !start
+            attempts to double the odds of the user for the wheel if and only if:
+                the user is present on the wheel and,
+                the user haven't used this command before
+   
+        """
+
+        if self.listening:
+            if self.verbose:
+                await ctx.send('doubling odds is not allowed right now.')
+
+        if not self.doubling_allowed:
+            if self.verbose:
+                await ctx.send('doubling odds is not allowed right now.')
+            return
+        
+        username = ctx.author.name
+        if username in doubled_odds_usernames:
+            if self.verbose:
+                await ctx.send(f'{ctx.author.name}, you already doubled your odds once')
+            return
+
+        if username not in usernames:
+            if self.verbose:
+                await ctx.send(f'{ctx.author.name}, you are not a member of the previos wheel!')
+            return
+        else:
+            odds = usernames.count(username)
+            for _ in range (odds):
+                usernames.append(username)
+            doubled_odds_usernames.append(username)
+            await ctx.send(f'{ctx.author.name}, your chances have been doubled!')
+
+if __name__ == '__main__':
+    bot = TwitchBot()
+    bot.run()
