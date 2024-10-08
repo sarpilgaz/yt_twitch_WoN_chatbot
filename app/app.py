@@ -8,6 +8,8 @@ with open('config.json') as config_file:
 
 API_KEY = config['WoN_api_key']
 
+#global variables, needed for both bots
+#TODO: do we need a mechanism to flush doubled_odds_usernames during execution?
 usernames = []
 doubled_odds_usernames = []
 MAX_USERS = config['max_users']
@@ -19,7 +21,7 @@ def unique_usernames():
 class TwitchBot(commands.Bot):
     """
         Class for the twitch bot, inherits from twitch API bot
-        Reads the necessary config from the config.json file
+        Reads the necessary config from the config populated before
     """
     def __init__(self):
         """Fields:
@@ -92,16 +94,21 @@ class TwitchBot(commands.Bot):
         """Command: !odds
 
             executable only by users in allowed_users
-            allows the users to use the !here command
+            toggles the use permission of !here command. 
         
         """
         if not self.is_user_allowed(ctx.author):
             if self.verbose:
                 await ctx.send(f'{ctx.author.name}, you are not allowed to start doubling odds.')
             return
+        
+        if self.doubling_allowed:
+            self.doubling_allowed = False
+            await ctx.send('doubling your odds is now disallowed!')
         else:
             self.doubling_allowed = True
-            await ctx.send('doubling your odds is now allowed!')
+            await ctx.send('doubling your odds is now allowed!')            
+
 
     @commands.command(name='wheel')
     async def wheel_command(self, ctx):
@@ -203,7 +210,7 @@ class TwitchBot(commands.Bot):
             'x-api-key': API_KEY
         }
 
-        try:
+        try: #response is not used for anything currently, could be removed in the future.
             response = requests.put(url, headers=headers, data=json.dumps(wheel))
             response.raise_for_status()
             jsonResponse = response.json()
