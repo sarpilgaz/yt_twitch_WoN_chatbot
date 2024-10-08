@@ -128,7 +128,7 @@ class TwitchBot(commands.Bot):
             await ctx.send(f'{username} has been added to the wheel!')
         else:
             if self.verbose:
-                ctx.send(f'{username}, you are already on the wheel!')
+                await ctx.send(f'{username}, you are already on the wheel!')
 
     @commands.command(name='here')
     async def here_command(self, ctx):
@@ -143,7 +143,8 @@ class TwitchBot(commands.Bot):
 
         if self.listening:
             if self.verbose:
-                await ctx.send('doubling odds is not allowed right now.')
+                await ctx.send('doubling odds is not allowed during active listening.')
+            return
 
         if not self.doubling_allowed:
             if self.verbose:
@@ -218,7 +219,7 @@ class TwitchBot(commands.Bot):
         """Command: loadWheel
             Executeable only by users in allowed_users
             once called, grabs the users from the wheel named in the config "wheel_name"
-            and replaces the array  usernames with the content retrieved.
+            and replaces the array 'usernames' with the content retrieved.
             This is questionable behaviour, but unsure of the requirements here we are.    
         """
 
