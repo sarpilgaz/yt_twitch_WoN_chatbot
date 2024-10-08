@@ -212,6 +212,51 @@ class TwitchBot(commands.Bot):
         except Exception as e:
             print('Failed to create the wheel. Please try again later.')
 
+
+    @commands.command(name='loadWheel')
+    async def loadWheel_command(self, ctx):
+        """Command: loadWheel
+            Executeable only by users in allowed_users
+            once called, grabs the users from the wheel named in the config "wheel_name"
+            and replaces the array  usernames with the content retrieved.
+            This is questionable behaviour, but unsure of the requirements here we are.    
+        """
+
+        if not self.is_user_allowed(ctx.author):
+            if self.verbose:
+                await ctx.send(f'{ctx.author.name}, you are not allowed to create a wheel.')
+            return
+        
+        url = "https://wheelofnames.com/api/v1/wheels/private"
+        headers = {
+            'Accept': 'application/json',
+            'x-api-key': API_KEY
+        }
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            jsonresponse = response.json()
+
+            wheels = jsonresponse['data'] ['wheels']
+            wheel_name = config['wheel_name']
+            wheel_found = None
+            for wheel in wheels:
+                if wheel['config']['title'] == wheel_name:
+                    wheel_found = wheel
+                    break
+
+        except Exception as e:
+            print(f'Failed to load the wheel. try again later. Error {e}')
+
+        if wheel_found:
+            entries = wheel_found['config']['entries']
+            usernames.clear()
+            usernames.extend([entry['text'] for entry in entries])               
+            await ctx.send(f'Users on Wheel {wheel_name} has been loaded!')
+        else:
+            await ctx.send(f'Wheel named {wheel_name} has not been found from the account!')
+
+
 if __name__ == '__main__':
     bot = TwitchBot()
     bot.run()
