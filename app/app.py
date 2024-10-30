@@ -246,8 +246,10 @@ class TwitchBot(commands.Bot):
             jsonresponse = response.json()
 
             wheels = jsonresponse['data'] ['wheels']
+            #grab the wheel name from the llocal config file
             wheel_name = config['wheel_name']
             wheel_found = None
+            #loop over the titles from the json response and grab the wheel that matches the name.
             for wheel in wheels:
                 if wheel['config']['title'] == wheel_name:
                     wheel_found = wheel
@@ -257,6 +259,7 @@ class TwitchBot(commands.Bot):
             print(f'Failed to load the wheel. try again later. Error {e}')
 
         if wheel_found:
+            #if a wheel is found, grab the usernames from entries section
             entries = wheel_found['config']['entries']
             usernames.clear()
             usernames.extend([entry['text'] for entry in entries])               

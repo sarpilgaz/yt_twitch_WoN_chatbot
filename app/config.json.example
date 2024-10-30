@@ -1,0 +1,11 @@
+{
+    "oauth_token": "<twitch oauth token>",
+    "channel": "<channel name to hook the twitch bot>",
+    "WoN_api_key": "<API key for wheel of names>",
+    "max_users": <integer, max amount of users allowed on a wheel>,
+    "verbose": <boolean, determine verbosity of the bots>,
+    "wheel_name": "<string, the name of the wheel to which you upload names or grab names from. need to be exact match>",
+    "allowed_users": [
+        <json array of usernames, between  "", seperated by commas, The list of privilaged twitch usernames, who are allowed to execute privilaged commands>
+    ]
+}
