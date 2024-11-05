@@ -1,4 +1,5 @@
 notes.txt
 app/credentials.txt
+app/__pycache__
 venv/
 app/config.json
