@@ -8,4 +8,16 @@
     "allowed_users": [
         <json array of usernames, between  "", seperated by commas, The list of privilaged twitch usernames, who are allowed to execute privilaged commands>
     ]
+
+    "yt_client_id": "<your google project client ID",
+    "yt_client_secret": "<your google project client secret>",
+    "scopes": [
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/youtube",
+    "https://www.googleapis.com/auth/youtube.force-ssl",
+    "https://www.googleapis.com/auth/youtube.readonly"
+  ],
+  "yt_livestream_ID":"<the ID of the livestream, needs to be changed for each new instance of the stream>" 
 }

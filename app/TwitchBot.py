@@ -1,14 +1,11 @@
-import requests
-import json
 from twitchio.ext import commands
-from BotManager import BotManager
 
 class TwitchBot(commands.Bot):
     """
         Class for the twitch bot, inherits from twitch API bot
         Reads the necessary config from the config populated before
     """
-    def __init__(self, bot_manager, tokenn, channels, verbosity, admins):
+    def __init__(self, bot_manager, tokenn, channels, verbosity):
         """Fields:
 
             listening: if the bot is collecting usernames for the wheel or not
