@@ -81,14 +81,42 @@ To use the bot locally or in production, follow these steps:
 
 ## Building and Running
 
-Currently, the application is run through the Python interpreter rather than as an executable. Python 3 and additional dependencies specified in `requirements.txt` are required.
+This application allows you to run both Twitch and YouTube bots for a live-streaming interaction. The bots handle chat messages, process commands, and interact with users. The bots can be run either directly from the Python interpreter or compiled into standalone executables using `PyInstaller`.
 
-To run the bot from its directory, app, use:
+For the youtube bot to work, you need to have a livestream already open, as you cannot access the chat without a livestream, unlike twitch.
+
+
+## Requirements
+
+### Dependencies
+- **Python 3** (tested with Python 3.7+)
+- **Additional Dependencies**: Install required dependencies from `requirements.txt`.
+
+```bash
+pip install -r requirements.txt
+```
+
+## Configuration
+Before running the bot, ensure that the `config.json` file is correctly set up. For the YouTube bot, you will need to provide a valid YouTube livestream ID in the field `"yt_livestream_id"`. You can find the livestream ID in the URL of your stream.
+
+## Running the bots
+
+### Python Interpreter
+You can run the bot directly from the source code. Make sure you have Python 3 and the required dependencies installed. To start the bot, execute the following command from the project directory:
 
 ```bash
 python3 app.py
 ```
-Before the bots start, an a popup will be created for the user to follow the oauth process to enable the application to access streaming resources
+When starting the bot, a popup will appear for the user to follow the OAuth process and grant the necessary permissions to access the streaming resources.
+
+### Compiling
+`pyinstaller` can be used to compile the source code.
+```bash
+pyinstaller --onefile --name chatbots app.py
+```
+This will create a single executable file located in the `dist` directory.
+
+
 
 ## Todo & Ideas
 
