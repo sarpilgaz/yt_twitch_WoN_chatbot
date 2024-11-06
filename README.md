@@ -2,9 +2,21 @@
 
 This bot automates actions for the Wheel of Names, such as adding users to a wheel, doubling their odds if allowed, loading an existing wheel, and more.
 
-Currently, the bot operates as a console application for Twitch, where all actions are accessible as Twitch commands with the `!` prefix.
+Currently, the bot operates as a console application for both Twitch and youtube, privilaged commands such as starting and closing the wheel, etc are only available from Twitch chat. This is because Twitch API is much more responsive and robust compared to youtube.
+All actions are accessible as commands with the `!` prefix.
 
 ---
+
+## Youtube Commands
+
+### `!wheel`
+- Adds people to the wheel if they are not already present.
+- Can only be run when the wheel is open.
+
+### `!here`
+- Usable only when doubling is enabled.
+- Doubles the odds for the command user if they are already in the wheel.
+- Users cannot double their odds more than once.
 
 ## Twitch Commands
 
@@ -16,7 +28,6 @@ Currently, the bot operates as a console application for Twitch, where all actio
 - Usable only when doubling is enabled.
 - Doubles the odds for the command user if they are already in the wheel.
 - Users cannot double their odds more than once.
-- Restricted to authorized users.
 
 ### `!odds`
 - Allows users from the previous wheel to double their odds for the next spin by toggling the permission for the `!here` command.
@@ -57,6 +68,14 @@ To use the bot locally or in production, follow these steps:
    - The account responsible for registering the bot as an application will need 2FA enabled. For more details on registering a bot and obtaining OAuth, refer to:
       - [Twitch Chat Documentation](https://dev.twitch.tv/docs/chat/)
       - [Twitch Token Generator](https://twitchtokengenerator.com/)
+4. **Youtube application registiration**
+    - Youtube has a more elaborate requirements in place compared to twitch.
+    - A very crude process is as follows:
+    - go to [google developer console](https://console.cloud.google.com/) for the google account that is going to manage chat messaging
+    - create a new project, name it however you wish
+    - Find and enable youtube data API v3
+    - click create credentials, then oauth client ID
+    - select desktop app, and finally note the client id and secret
 
 ---
 
@@ -64,21 +83,20 @@ To use the bot locally or in production, follow these steps:
 
 Currently, the application is run through the Python interpreter rather than as an executable. Python 3 and additional dependencies specified in `requirements.txt` are required.
 
-To run the bot from its directory, use:
+To run the bot from its directory, app, use:
 
 ```bash
 python3 app.py
 ```
+Before the bots start, an a popup will be created for the user to follow the oauth process to enable the application to access streaming resources
+
 ## Todo & Ideas
 
-- **Critical: YouTube Chatbot Integration:**  
-  Add functionality to support YouTube chat alongside Twitch.
-
-- **Code Refactoring:**  
-  Commands for both platforms will likely share functionality. Common actions should be abstracted into functions for better reusability.
+- **State Machine implementation for commands:**
+  Currently, many if statements are used to check if a command can be run with the current state. A better way to control which commands can be run when is to implement a state machine. 
 
 - **GUI or Web Interface:**  
-  After full functionality is added, consider developing a GUI or web interface. A web interface may require remote hosting, introducing security challenges.
+  Developing a GUI or web interface can be considered. A web interface may require remote hosting, introducing security challenges.
 
 - **Alternative Command Access:**  
   Currently, all interactions happen through commands. It may be beneficial to provide certain privileged commands (e.g., starting/stopping name collection) via GUI buttons or console text commands for more secure access control.

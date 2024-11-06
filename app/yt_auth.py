@@ -1,6 +1,12 @@
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 def Authorize(config):
+    """function to run the oauth flow for the youtube chatbot.
+    scopes required are defined in the config, but should not be touched.
+    port to be used for the auth process is also taken from the 
+
+    return value is the flow object as defined in the oauth lib.
+    """
     
     flow = InstalledAppFlow.from_client_config({
         "installed": {
@@ -14,7 +20,7 @@ def Authorize(config):
 
     flow.run_local_server(
         host='localhost',
-        port=5500,
+        port=config['port'],
         authorization_prompt_message="")
 
     return flow

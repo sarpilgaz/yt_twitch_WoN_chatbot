@@ -24,7 +24,7 @@ class TwitchBot(commands.Bot):
         print(f'Connected to {self.connected_channels}')
 
     @commands.command(name='start') 
-    async def start_command(self, ctx):
+    async def __start_command(self, ctx):
         """Command: !start
 
             executable only by users in allowed_users
@@ -44,7 +44,7 @@ class TwitchBot(commands.Bot):
                 await ctx.send('Now listening for usernames!')
 
     @commands.command(name='stop')
-    async def stop_command(self, ctx):
+    async def __stop_command(self, ctx):
         """Command: !stop
 
             executable only by users in allowed_users
@@ -64,7 +64,7 @@ class TwitchBot(commands.Bot):
                 await ctx.send('Now stopped listening for usernames!')
 
     @commands.command(name='odds')
-    async def odds_command(self, ctx):
+    async def __odds_command(self, ctx):
         """Command: !odds
 
             executable only by users in allowed_users
@@ -87,7 +87,7 @@ class TwitchBot(commands.Bot):
 
 
     @commands.command(name='wheel')
-    async def wheel_command(self, ctx):
+    async def __wheel_command(self, ctx):
         """Command: !wheel
 
             executable by users only after the command !start
@@ -95,7 +95,7 @@ class TwitchBot(commands.Bot):
         
         """
         username = ctx.author.name
-        ret = await self.bot_manager.add_username_to_wheel(username)
+        ret = self.bot_manager.add_username_to_wheel(username)
 
         match ret:
             case -3:
@@ -111,7 +111,7 @@ class TwitchBot(commands.Bot):
                 await ctx.send(f'{username} has been added to the wheel!')
 
     @commands.command(name='here')
-    async def here_command(self, ctx):
+    async def __here_command(self, ctx):
         """Command: !here
 
             executable only after the commands !odds and while the bot is not listening, so before !start
@@ -122,7 +122,7 @@ class TwitchBot(commands.Bot):
         """
         
         username = ctx.author.name
-        ret = await self.bot_manager.double_odds(username)
+        ret = self.bot_manager.double_odds(username)
 
         match ret:
             case -4:
@@ -141,7 +141,7 @@ class TwitchBot(commands.Bot):
                 await ctx.send(f'{ctx.author.name}, your chances have been doubled!')
 
     @commands.command(name='getWheel')
-    async def getWheel_command(self, ctx):
+    async def __getWheel_command(self, ctx):
         """Command: getWheel:
         
             executable only by users in allowed_users
@@ -168,7 +168,7 @@ class TwitchBot(commands.Bot):
 
 
     @commands.command(name='loadWheel')
-    async def loadWheel_command(self, ctx):
+    async def __loadWheel_command(self, ctx):
         """Command: loadWheel
             Executeable only by users in allowed_users
             once called, grabs the users from the wheel named in the config "wheel_name"

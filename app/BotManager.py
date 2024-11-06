@@ -1,6 +1,6 @@
 import requests
 import json
-import asyncio
+import threading
 
 #TODO: do we need a mechanism to flush doubled_odds_usernames during execution?
 
@@ -10,18 +10,18 @@ class BotManager:
         self.doubled_odds_usernames = set()
         self.MAX_USERS = max_users
         self.WON_KEY = won_key
-        self.usernames_lock = asyncio.Lock()
+        self.usernames_lock = threading.Lock()
         self.allowed_users = admins
         self.wheel_name = wheel_name
 
         self.listening = False
         self.doubling_allowed = False
 
-    def is_user_allowed(self, user):
+    def __is_user_allowed(self, user):
         """Helper function to check if the user is allowed to run certain commands."""
         return user.lower() in self.allowed_users
 
-    def unique_usernames(self):
+    def __unique_usernames(self):
         """helper function to return the count of unique usernames"""
         return len(set(self.usernames))
     
@@ -32,7 +32,7 @@ class BotManager:
         -1: given user is not privilaged, therefore cannot execute this command
         0: success
         """
-        if not self.is_user_allowed(user):
+        if not self.__is_user_allowed(user):
             return -1
     
         self.listening = toggle
@@ -43,13 +43,13 @@ class BotManager:
 
     def toggle_doubling(self, user) -> int:
         """"toggle for the bots to allow or disallow the doubling of username odds
-            so, allow the use of !here command
+        so, allow the use of !here command
         exit codes:
         -1: given user is not privilaged, therefore cannot execute this command
         0: success, doubling is not allowed
         1: success, doubling is allowed
         """
-        if not self.is_user_allowed(user):
+        if not self.__is_user_allowed(user):
             return -1
     
         self.doubling_allowed = not self.doubling_allowed
@@ -58,7 +58,7 @@ class BotManager:
         else: return 0 
 
     
-    async def add_username_to_wheel(self, username) -> int:
+    def add_username_to_wheel(self, username) -> int:
         """add a given username to the list.
         exit codes:
         -3: bots are not allowed to listen currently
@@ -69,19 +69,23 @@ class BotManager:
         if not self.listening:
             return -3
 
-        if self.unique_usernames() >= self.MAX_USERS:
+        if self.__unique_usernames() >= self.MAX_USERS:
             return -2
         
         if username in self.usernames:
             return -1
         
-        async with self.usernames_lock:
-            self.usernames.append(username)
-        
+        #critical section
+        self.usernames_lock.acquire()
+
+        self.usernames.append(username)
+
+        self.usernames_lock.release()
         return 0
     
-    async def double_odds(self, username) -> int:
-        """double the odds of a given username, essentialls doubling their occurance in the list
+    def double_odds(self, username) -> int:
+        """
+        double the odds of a given username, essentialls doubling their occurance in the list
         exit codes:
         -4: doubling odds is not allowed during active listening, 
         -3: doubling was not allowed yet
@@ -101,23 +105,28 @@ class BotManager:
         if username not in self.usernames:
             return -1
         
-        async with self.usernames_lock:
-            odds = self.usernames.count(username)
-            for _ in range (odds):
-                self.usernames.append(username)
-            self.doubled_odds_usernames.add(username)
+        #critical section
+        self.usernames_lock.acquire()
+
+        odds = self.usernames.count(username)
+        for _ in range (odds):
+            self.usernames.append(username)
+        self.doubled_odds_usernames.add(username)
+
+        self.usernames_lock.release()
 
         return 0
     
     def create_wheel(self, username):
         """create a wheel from the usernames list stored. The private wheel is created in the account of the key holder
+        if the wheel name defined in the config doesn't exist, a wheel will be created, if it exists, then the wheel will be overriden instead
         exit codes:
         -2: Wheel of names API error occured
         -1: given username is not allowed to run this command
         0: success
         """
 
-        if not self.is_user_allowed(username):
+        if not self.__is_user_allowed(username):
             return -1
 
         wheel = {
@@ -152,7 +161,7 @@ class BotManager:
         -1: given username is not allowed to run this command
         0: success
         """
-        if not self.is_user_allowed(username):
+        if not self.__is_user_allowed(username):
             return -1
         
         url = "https://wheelofnames.com/api/v1/wheels/private"

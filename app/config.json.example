@@ -8,7 +8,7 @@
     "allowed_users": [
         <json array of usernames, between  "", seperated by commas, The list of privilaged twitch usernames, who are allowed to execute privilaged commands>
     ]
-
+    "port": <port wihch the youtube oauth flow will connect to. Should be set to a non-standard port for best reuslts>,
     "yt_client_id": "<your google project client ID",
     "yt_client_secret": "<your google project client secret>",
     "scopes": [
