@@ -102,7 +102,7 @@ Before running the bot, ensure that the `config.json` file is correctly set up. 
 ## Running the bots
 
 ### Python Interpreter
-You can run the bot directly from the source code. Make sure you have Python 3 and the required dependencies installed. To start the bot, execute the following command from the project directory:
+You can run the bot directly from the source code. Make sure you have Python 3 and the required dependencies installed. `config.json` must be in the same directory as `main.py` To start the bot, execute the following command from the project directory:
 
 ```bash
 python3 app.py
@@ -112,13 +112,16 @@ When starting the bot, a popup will appear for the user to follow the OAuth proc
 ### Compiling
 `pyinstaller` can be used to compile the source code.
 ```bash
-pyinstaller --onefile --name chatbots app.py
+pyinstaller --clean --onefile --add-data "config.json:." --name chatbots main.py
 ```
-This will create a single executable file located in the `dist` directory.
+This will create a single executable file located in the `dist` directory. It should not be necessary, but it is best practice to have `config.json` in the same directory as the executeable created.
 
 
 
 ## Todo & Ideas
+
+- **Better config file handling:**
+  Currently, the handling of the config file is very flimsy, as it is hardcoded to assume config.json lives in the same directory. This can potentially be made more robust.
 
 - **State Machine implementation for commands:**
   Currently, many if statements are used to check if a command can be run with the current state. A better way to control which commands can be run when is to implement a state machine. 
