@@ -6,11 +6,25 @@ import threading
 
 class BotManager:
     def __init__(self, max_users, won_key, admins, wheel_name):
+        """fields:
+        usernames: list of usernames whoare part of the wheel
+        doubled odds usernames: a set of usernames who doubled their odds once during the execution of the bots
+        MAX USERS: maximum amount of users allowed to be on a wheel, defined in the config
+        WON_KEY: the wheel of names API key for user, whose wheels will be accessed and changed
+        usernames and toggle locks: thread locks to guarantee mutual exclusion to shared data objects
+        allowed users: privilaged users defined in the config who are allowed to use privilaged commands
+        wheel name: name of the wheel that will be acted upon for wheel of name commands.
+                    If the given wheel name doesnt exist when creating a wheel, a new wheel wil be made, 
+                    otherwise, the existing one is edited
+                    If the given wheel with name doesnt exist when trying to load from, a failure is given, and an exection is raised  
+        """
+
         self.usernames = []
         self.doubled_odds_usernames = set()
         self.MAX_USERS = max_users
         self.WON_KEY = won_key
         self.usernames_lock = threading.Lock()
+        self.toggle_lock = threading.Lock()
         self.allowed_users = admins
         self.wheel_name = wheel_name
 
@@ -34,8 +48,13 @@ class BotManager:
         """
         if not self.__is_user_allowed(user):
             return -1
-    
+
+        #critical section
+        self.toggle_lock.acquire()
+
         self.listening = toggle
+
+        self.toggle_lock.release()
 
         if self.listening != toggle:
             return -2
@@ -52,7 +71,12 @@ class BotManager:
         if not self.__is_user_allowed(user):
             return -1
     
+        #critical section
+        self.toggle_lock.acquire()
+
         self.doubling_allowed = not self.doubling_allowed
+
+        self.toggle_lock.release()
 
         if self.doubling_allowed: return 1 
         else: return 0 
@@ -128,6 +152,8 @@ class BotManager:
 
         if not self.__is_user_allowed(username):
             return -1
+        #critical section
+        self.usernames_lock.acquire()
 
         wheel = {
             'config': {
@@ -136,6 +162,8 @@ class BotManager:
                 'entries': [{'text': user} for user in self.usernames]
             }
         }
+
+        self.usernames_lock.release()
 
         url = 'https://wheelofnames.com/api/v1/wheels/private'
         headers = {
@@ -149,6 +177,8 @@ class BotManager:
             response.raise_for_status()
             jsonResponse = response.json()
             path = jsonResponse['data']['path']
+
+            self.usernames_lock
             return 0
             
         
@@ -188,10 +218,15 @@ class BotManager:
             return -2
 
         if wheel_found:
+            #critical section
+            self.usernames_lock.acquire()
+
             #if a wheel is found, grab the usernames from entries section
             entries = wheel_found['config']['entries']
             self.usernames.clear()
             self.usernames.extend([entry['text'] for entry in entries])
+
+            self.usernames_lock.release()
             return 0               
         else:
             return -2
