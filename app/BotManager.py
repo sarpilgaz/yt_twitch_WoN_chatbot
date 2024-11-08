@@ -152,6 +152,10 @@ class BotManager:
 
         if not self.__is_user_allowed(username):
             return -1
+
+        if self.listening:
+            return -2
+
         #critical section
         self.usernames_lock.acquire()
 
@@ -193,7 +197,9 @@ class BotManager:
         """
         if not self.__is_user_allowed(username):
             return -1
-        
+
+        if self.listening:
+            return -2        
         url = "https://wheelofnames.com/api/v1/wheels/private"
         headers = {
             'Accept': 'application/json',

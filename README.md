@@ -44,10 +44,12 @@ All actions are accessible as commands with the `!` prefix.
 ### `!loadWheel`
 - Loads an existing wheel and its contents into the application for further actions.
 - Restricted to authorized users.
+- Cannot be used while listening
 
 ### `!getWheel`
 - Creates or updates a wheel with the stored usernames. If a wheel with the specified name exists in `config.json`, it will be updated; otherwise, a new wheel will be created under the user's wheels.
 - Restricted to authorized users.
+- Cannot be used while listening
 
 ---
 
