@@ -5,6 +5,8 @@ This bot automates actions for the Wheel of Names, such as adding users to a whe
 Currently, the bot operates as a console application for both Twitch and youtube, privilaged commands such as starting and closing the wheel, etc are only available from Twitch chat. This is because Twitch API is much more responsive and robust compared to youtube.
 All actions are accessible as commands with the `!` prefix.
 
+
+
 ---
 
 ## Youtube Commands
@@ -28,6 +30,7 @@ All actions are accessible as commands with the `!` prefix.
 - Usable only when doubling is enabled.
 - Doubles the odds for the command user if they are already in the wheel.
 - Users cannot double their odds more than once.
+- Cannot be used while listening
 
 ### `!odds`
 - Allows users from the previous wheel to double their odds for the next spin by toggling the permission for the `!here` command.
@@ -66,7 +69,7 @@ To use the bot locally or in production, follow these steps:
    - Refer to the [Wheel of Names API documentation](https://wheelofnames.stoplight.io/docs/wheelofnames/aqbgvmfot9ua7-wheelofnames-v1) for more details.
 
 3. **Twitch OAuth Token:**
-   - Generate an OAuth token for either yourself or the bot account that will manage chat messaging.
+   - Generate an OAuth token for either yourself or the bot account that will manage chat messaging, note them in the corresponding fields in `config.json`.
    - The account responsible for registering the bot as an application will need 2FA enabled. For more details on registering a bot and obtaining OAuth, refer to:
       - [Twitch Chat Documentation](https://dev.twitch.tv/docs/chat/)
       - [Twitch Token Generator](https://twitchtokengenerator.com/)
@@ -77,13 +80,14 @@ To use the bot locally or in production, follow these steps:
     - create a new project, name it however you wish
     - Find and enable youtube data API v3
     - click create credentials, then oauth client ID
-    - select desktop app, and finally note the client id and secret
+    - select desktop app, and finally note the client id and secret in the corresponding fields in `config.json`
 
 ---
 
 ## Building and Running
+The bots can be run either directly from the Python interpreter or compiled into standalone executables using `PyInstaller`.
 
-This application allows you to run both Twitch and YouTube bots for a live-streaming interaction. The bots handle chat messages, process commands, and interact with users. The bots can be run either directly from the Python interpreter or compiled into standalone executables using `PyInstaller`.
+If the code is compiled, the configuration file `config.json` should be copiied over to the directory where the executeable is.
 
 For the youtube bot to work, you need to have a livestream already open, as you cannot access the chat without a livestream, unlike twitch.
 
@@ -99,7 +103,8 @@ pip install -r requirements.txt
 ```
 
 ## Configuration
-Before running the bot, ensure that the `config.json` file is correctly set up. For the YouTube bot, you will need to provide a valid YouTube livestream ID in the field `"yt_livestream_id"`. You can find the livestream ID in the URL of your stream.
+Before running the bot, ensure that the `config.json` file is correctly set up as explained before. For the YouTube bot, you will need to provide a valid YouTube livestream ID in the field `"yt_livestream_id"`. You can find the livestream ID in the URL of your stream. This unfortunetely means this field needs to be set up
+before every unique stream with the new livestream id.
 
 ## Running the bots
 
@@ -116,7 +121,7 @@ When starting the bot, a popup will appear for the user to follow the OAuth proc
 ```bash
 pyinstaller --clean --onefile --add-data "config.json:." --name chatbots main.py
 ```
-This will create a single executable file located in the `dist` directory. It should not be necessary, but it is best practice to have `config.json` in the same directory as the executeable created.
+This will create a single executable file located in the `dist` directory. `config.json` must be in the same directory as the executeable created.
 
 
 

@@ -182,7 +182,6 @@ class BotManager:
             jsonResponse = response.json()
             path = jsonResponse['data']['path']
 
-            self.usernames_lock
             return 0
             
         

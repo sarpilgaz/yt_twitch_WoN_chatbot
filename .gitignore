@@ -6,7 +6,7 @@ app/credentials.txt
 app/__pycache__
 app/build
 app/dist
-app/main.spec
+app/chatbots.spec
 
 #ignore virtual env 
 venv/

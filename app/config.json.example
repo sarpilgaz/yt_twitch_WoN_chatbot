@@ -1,16 +1,16 @@
 {
     "oauth_token": "<twitch oauth token>",
-    "channel": "<channel name to hook the twitch bot>",
+    "channel": "<channel name to hook the twitch bot to>",
     "WoN_api_key": "<API key for wheel of names>",
     "max_users": <integer, max amount of users allowed on a wheel>,
-    "verbose": <boolean, determine verbosity of the bots>,
+    "verbose": <true or false, determine verbosity of the bots. When set to true, the bots will do error reporting in the chat about their command.>,
     "wheel_name": "<string, the name of the wheel to which you upload names or grab names from. need to be exact match>",
     "allowed_users": [
         <json array of usernames, between  "", seperated by commas, The list of privilaged twitch usernames, who are allowed to execute privilaged commands>
     ]
-    "port": <port wihch the youtube oauth flow will connect to. Should be set to a non-standard port for best reuslts>,
-    "yt_client_id": "<your google project client ID",
-    "yt_client_secret": "<your google project client secret>",
+    "port": <port wihch the youtube oauth flow will connect to. Should be set to a non-standard, ephemeral port for best reuslts For ex: a value in range 49152–65535>,
+    "yt_client_id": "<your google project, or bot, client ID",
+    "yt_client_secret": "<your google project client, or bot,  secret>",
     "scopes": [
     "openid",
     "https://www.googleapis.com/auth/userinfo.email",
